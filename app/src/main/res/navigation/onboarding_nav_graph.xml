@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/onboarding_nav_graph"
+    app:startDestination="@id/onboardingFragment">
+
+    <fragment
+        android:id="@+id/onboardingFragment"
+        android:name="com.example.wellnessbuddy.fragments.OnboardingFragment"
+        android:label="Onboarding"
+        tools:layout="@layout/fragment_onboarding">
+        
+        <argument
+            android:name="pageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+        
+        <action
+            android:id="@+id/action_onboardingFragment_self"
+            app:destination="@id/onboardingFragment" />
+            
+        <action
+            android:id="@+id/action_onboardingFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.wellnessbuddy.fragments.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        
+        <action
+            android:id="@+id/action_loginFragment_to_signupFragment"
+            app:destination="@id/signupFragment" />
+            
+        <action
+            android:id="@+id/action_loginFragment_to_mainActivity"
+            app:destination="@id/mainActivity" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/signupFragment"
+        android:name="com.example.wellnessbuddy.fragments.SignupFragment"
+        android:label="Sign Up"
+        tools:layout="@layout/fragment_signup">
+        
+        <action
+            android:id="@+id/action_signupFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+            
+        <action
+            android:id="@+id/action_signupFragment_to_mainActivity"
+            app:destination="@id/mainActivity" />
+    </fragment>
+
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.example.wellnessbuddy.MainActivity"
+        android:label="Wellness Buddy" />
+
+</navigation>

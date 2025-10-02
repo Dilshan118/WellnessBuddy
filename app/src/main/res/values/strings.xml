@@ -81,4 +81,15 @@
     <string name="weak_password">Password must be at least 6 characters</string>
     <string name="invalid_email">Please enter a valid email address</string>
     <string name="all_fields_required">All fields are required</string>
+    
+    <!-- Onboarding -->
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="get_started">Get Started</string>
+    <string name="welcome_title">Welcome to Wellness Buddy</string>
+    <string name="habits_title_onboarding">Track Your Habits</string>
+    <string name="mood_title_onboarding">Monitor Your Mood</string>
+    <string name="hydration_title_onboarding">Stay Hydrated</string>
+    <string name="ready_title">Ready to Begin?</string>
 </resources>

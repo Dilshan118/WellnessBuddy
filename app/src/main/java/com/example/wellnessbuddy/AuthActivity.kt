@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.wellnessbuddy.data.AuthManager
+import com.example.wellnessbuddy.data.OnboardingManager
 import com.example.wellnessbuddy.fragments.LoginFragment
 import com.example.wellnessbuddy.fragments.SignupFragment
 
@@ -20,6 +21,7 @@ import com.example.wellnessbuddy.fragments.SignupFragment
 class AuthActivity : AppCompatActivity() {
     
     private lateinit var authManager: AuthManager
+    private lateinit var onboardingManager: OnboardingManager
     private lateinit var navController: NavController
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +36,7 @@ class AuthActivity : AppCompatActivity() {
         }
         
         authManager = AuthManager(this)
+        onboardingManager = OnboardingManager(this)
         
         // Setup navigation
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.auth_nav_host) as NavHostFragment
@@ -43,9 +46,14 @@ class AuthActivity : AppCompatActivity() {
         if (authManager.isLoggedIn()) {
             navigateToMain()
         } else {
-            // Start with login fragment
-            if (savedInstanceState == null) {
-                navController.navigate(R.id.loginFragment)
+            // Check if onboarding is needed
+            if (!onboardingManager.isOnboardingCompleted()) {
+                startOnboarding()
+            } else {
+                // Start with login fragment
+                if (savedInstanceState == null) {
+                    navController.navigate(R.id.loginFragment)
+                }
             }
         }
     }
@@ -55,6 +63,17 @@ class AuthActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+    
+    private fun startOnboarding() {
+        val bundle = Bundle().apply {
+            putInt("pageIndex", 0)
+        }
+        navController.navigate(R.id.onboardingFragment, bundle)
+    }
+    
+    fun completeOnboarding() {
+        onboardingManager.completeOnboarding()
     }
     
     override fun onBackPressed() {
