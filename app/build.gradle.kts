@@ -33,6 +33,13 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    
+    // Fix for test configuration issues
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = false
+        }
+    }
 }
 
 dependencies {
@@ -47,7 +54,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.livedata)
     implementation(libs.androidx.work.runtime)
-    // implementation(libs.mpandroidchart) // Temporarily disabled
+    implementation(libs.mpandroidchart)
     implementation(libs.gson)
     
     testImplementation(libs.junit)

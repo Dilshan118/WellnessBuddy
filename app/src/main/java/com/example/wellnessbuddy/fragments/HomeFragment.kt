@@ -118,10 +118,20 @@ class HomeFragment : Fragment() {
         
         // Load habits
         val updatedHabits = habitManager.loadHabits()
-        val habitsAdapter = HabitsAdapter(updatedHabits) { habit ->
-            habitManager.completeHabit(habit.id)
-            loadData() // Refresh data
-        }
+        val habitsAdapter = HabitsAdapter(
+            habits = updatedHabits,
+            onCompleteClick = { habit ->
+                habitManager.completeHabit(habit.id)
+                loadData() // Refresh data
+            },
+            onEditClick = { habit ->
+                // Could navigate to edit or show toast
+            },
+            onDeleteClick = { habit ->
+                habitManager.deleteHabit(habit.id)
+                loadData() // Refresh data
+            }
+        )
         habitsRecyclerView.adapter = habitsAdapter
         
         // Load today's mood

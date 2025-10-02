@@ -47,10 +47,19 @@ class HabitTrackerFragment : Fragment() {
     
     private fun setupRecyclerView() {
         habitsRecyclerView.layoutManager = LinearLayoutManager(context)
-        habitsAdapter = HabitsAdapter(emptyList()) { habit ->
-            habitManager.completeHabit(habit.id)
-            loadHabits() // Refresh the list
-        }
+        habitsAdapter = HabitsAdapter(
+            habits = emptyList(),
+            onCompleteClick = { habit ->
+                habitManager.completeHabit(habit.id)
+                loadHabits() // Refresh the list
+            },
+            onEditClick = { habit ->
+                showEditHabitDialog(habit)
+            },
+            onDeleteClick = { habit ->
+                showDeleteConfirmationDialog(habit)
+            }
+        )
         habitsRecyclerView.adapter = habitsAdapter
     }
     
@@ -62,10 +71,19 @@ class HabitTrackerFragment : Fragment() {
     
     private fun loadHabits() {
         val habits = habitManager.loadHabits()
-        habitsAdapter = HabitsAdapter(habits) { habit ->
-            habitManager.completeHabit(habit.id)
-            loadHabits() // Refresh the list
-        }
+        habitsAdapter = HabitsAdapter(
+            habits = habits,
+            onCompleteClick = { habit ->
+                habitManager.completeHabit(habit.id)
+                loadHabits() // Refresh the list
+            },
+            onEditClick = { habit ->
+                showEditHabitDialog(habit)
+            },
+            onDeleteClick = { habit ->
+                showDeleteConfirmationDialog(habit)
+            }
+        )
         habitsRecyclerView.adapter = habitsAdapter
     }
     
@@ -135,16 +153,20 @@ class HabitTrackerFragment : Fragment() {
             }
             .setNegativeButton("Cancel", null)
             .setNeutralButton("Delete") { _, _ ->
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Delete Habit")
-                    .setMessage("Are you sure you want to delete this habit?")
-                    .setPositiveButton("Delete") { _, _ ->
-                        habitManager.deleteHabit(habit.id)
-                        loadHabits()
-                    }
-                    .setNegativeButton("Cancel", null)
-                    .show()
+                showDeleteConfirmationDialog(habit)
             }
+            .show()
+    }
+    
+    private fun showDeleteConfirmationDialog(habit: Habit) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delete Habit")
+            .setMessage("Are you sure you want to delete '${habit.name}'? This action cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                habitManager.deleteHabit(habit.id)
+                loadHabits()
+            }
+            .setNegativeButton("Cancel", null)
             .show()
     }
     

@@ -68,6 +68,51 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Theme Settings Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/theme_settings_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🎨 Theme Settings"
+                    android:textSize="16sp"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dark Mode"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=">"
+                    android:textSize="16sp"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- About Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/about_card"

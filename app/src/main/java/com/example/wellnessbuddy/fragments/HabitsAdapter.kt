@@ -15,7 +15,9 @@ import com.google.android.material.textview.MaterialTextView
  */
 class HabitsAdapter(
     private val habits: List<Habit>,
-    private val onCompleteClick: (Habit) -> Unit
+    private val onCompleteClick: (Habit) -> Unit,
+    private val onEditClick: (Habit) -> Unit,
+    private val onDeleteClick: (Habit) -> Unit
 ) : RecyclerView.Adapter<HabitsAdapter.HabitViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitViewHolder {
@@ -50,13 +52,34 @@ class HabitsAdapter(
             if (habit.isFullyCompleted()) {
                 completeBtn.text = "✓ Done"
                 completeBtn.isEnabled = false
+                completeBtn.setBackgroundColor(itemView.context.getColor(R.color.neon_success))
             } else {
                 completeBtn.text = "Complete"
                 completeBtn.isEnabled = true
+                completeBtn.setBackgroundColor(itemView.context.getColor(R.color.neon_primary))
                 completeBtn.setOnClickListener {
                     onCompleteClick(habit)
                 }
             }
+            
+            // Add long click for edit/delete options
+            itemView.setOnLongClickListener {
+                showHabitOptions(habit)
+                true
+            }
+        }
+        
+        private fun showHabitOptions(habit: Habit) {
+            val options = arrayOf("Edit", "Delete")
+            androidx.appcompat.app.AlertDialog.Builder(itemView.context)
+                .setTitle("Habit Options")
+                .setItems(options) { _, which ->
+                    when (which) {
+                        0 -> onEditClick(habit)
+                        1 -> onDeleteClick(habit)
+                    }
+                }
+                .show()
         }
     }
 }

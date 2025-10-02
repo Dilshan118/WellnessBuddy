@@ -10,17 +10,35 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp"
+        android:background="@color/modern_background">
 
-        <!-- Header -->
-        <com.google.android.material.textview.MaterialTextView
+        <!-- Modern Header -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/habits_title"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
+            
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/habits_title"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:fontFamily="sans-serif-light"
+                android:letterSpacing="0.02" />
+                
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Track your daily wellness habits"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif" />
+        </LinearLayout>
 
         <!-- Habits List -->
         <androidx.recyclerview.widget.RecyclerView
@@ -29,18 +47,21 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingBottom="80dp"
+            android:scrollbars="vertical"
             tools:listitem="@layout/item_habit" />
 
     </LinearLayout>
 
-    <!-- Floating Action Button -->
+    <!-- Modern Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_habit_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:src="@drawable/ic_add"
-        app:tint="@android:color/white" />
+        app:backgroundTint="@color/neon_primary"
+        app:tint="@color/text_primary"
+        app:elevation="12dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

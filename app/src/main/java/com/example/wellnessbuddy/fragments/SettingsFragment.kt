@@ -10,6 +10,8 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.example.wellnessbuddy.R
 import com.example.wellnessbuddy.data.HydrationManager
+import com.example.wellnessbuddy.theme.ThemeManager
+import com.example.wellnessbuddy.dialogs.ThemeSelectorDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textview.MaterialTextView
@@ -20,8 +22,10 @@ import com.google.android.material.textview.MaterialTextView
 class SettingsFragment : Fragment() {
     
     private lateinit var hydrationManager: HydrationManager
+    private lateinit var themeManager: ThemeManager
     private lateinit var hydrationGoalText: MaterialTextView
     private lateinit var notificationSettingsCard: MaterialCardView
+    private lateinit var themeSettingsCard: MaterialCardView
     private lateinit var aboutCard: MaterialCardView
     private lateinit var shareDataBtn: MaterialButton
     
@@ -37,9 +41,11 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         hydrationManager = HydrationManager(requireContext())
+        themeManager = ThemeManager(requireContext())
         
         hydrationGoalText = view.findViewById(R.id.hydration_goal_text)
         notificationSettingsCard = view.findViewById(R.id.notification_settings_card)
+        themeSettingsCard = view.findViewById(R.id.theme_settings_card)
         aboutCard = view.findViewById(R.id.about_card)
         shareDataBtn = view.findViewById(R.id.share_data_btn)
         
@@ -50,6 +56,10 @@ class SettingsFragment : Fragment() {
     private fun setupViews() {
         notificationSettingsCard.setOnClickListener {
             showNotificationSettingsDialog()
+        }
+        
+        themeSettingsCard.setOnClickListener {
+            showThemeSelectorDialog()
         }
         
         aboutCard.setOnClickListener {
@@ -84,6 +94,15 @@ class SettingsFragment : Fragment() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+    
+    private fun showThemeSelectorDialog() {
+        val dialog = ThemeSelectorDialog.newInstance { selectedTheme ->
+            themeManager.setTheme(selectedTheme)
+            // Restart activity to apply theme changes
+            activity?.recreate()
+        }
+        dialog.show(parentFragmentManager, "theme_selector")
     }
     
     private fun showAboutDialog() {

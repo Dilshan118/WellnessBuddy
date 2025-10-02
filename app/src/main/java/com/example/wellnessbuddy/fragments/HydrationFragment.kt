@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.example.wellnessbuddy.R
 import com.example.wellnessbuddy.data.HydrationManager
 import com.example.wellnessbuddy.data.HydrationSettings
+import com.example.wellnessbuddy.notifications.HydrationReminderManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -22,6 +23,7 @@ import com.google.android.material.textview.MaterialTextView
 class HydrationFragment : Fragment() {
     
     private lateinit var hydrationManager: HydrationManager
+    private lateinit var reminderManager: HydrationReminderManager
     private lateinit var hydrationProgress: CircularProgressIndicator
     private lateinit var hydrationText: MaterialTextView
     private lateinit var addGlassBtn: MaterialButton
@@ -41,6 +43,7 @@ class HydrationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         hydrationManager = HydrationManager(requireContext())
+        reminderManager = HydrationReminderManager(requireContext())
         
         hydrationProgress = view.findViewById(R.id.hydration_progress)
         hydrationText = view.findViewById(R.id.hydration_text)
@@ -134,6 +137,14 @@ class HydrationFragment : Fragment() {
                     isEnabled = isEnabled
                 )
                 hydrationManager.saveSettings(newSettings)
+                
+                // Update reminder schedule
+                if (isEnabled) {
+                    reminderManager.scheduleReminders()
+                } else {
+                    reminderManager.cancelReminders()
+                }
+                
                 loadData()
             }
             .setNegativeButton("Cancel", null)
