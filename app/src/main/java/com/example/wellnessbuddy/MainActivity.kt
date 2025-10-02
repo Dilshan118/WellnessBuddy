@@ -1,5 +1,6 @@
 package com.example.wellnessbuddy
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import com.example.wellnessbuddy.fragments.*
 import com.example.wellnessbuddy.sensors.WellnessSensorManager
 import com.example.wellnessbuddy.data.MoodManager
 import com.example.wellnessbuddy.data.MoodEntry
+import com.example.wellnessbuddy.data.AuthManager
 import com.example.wellnessbuddy.theme.ThemeManager
 import java.util.*
 
@@ -20,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sensorManager: WellnessSensorManager
     private lateinit var moodManager: MoodManager
     private lateinit var themeManager: ThemeManager
+    private lateinit var authManager: AuthManager
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +33,14 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+        
+        authManager = AuthManager(this)
+        
+        // Check if user is logged in
+        if (!authManager.isLoggedIn()) {
+            navigateToAuth()
+            return
         }
         
         setupBottomNavigation()
@@ -130,5 +141,17 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         sensorManager.stopListening()
+    }
+    
+    private fun navigateToAuth() {
+        val intent = Intent(this, AuthActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+    
+    fun logout() {
+        authManager.logout()
+        navigateToAuth()
     }
 }

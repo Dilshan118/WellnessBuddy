@@ -10,6 +10,7 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.example.wellnessbuddy.R
 import com.example.wellnessbuddy.data.HydrationManager
+import com.example.wellnessbuddy.data.AuthManager
 import com.example.wellnessbuddy.theme.ThemeManager
 import com.example.wellnessbuddy.dialogs.ThemeSelectorDialog
 import com.google.android.material.button.MaterialButton
@@ -22,6 +23,7 @@ import com.google.android.material.textview.MaterialTextView
 class SettingsFragment : Fragment() {
     
     private lateinit var hydrationManager: HydrationManager
+    private lateinit var authManager: AuthManager
     private lateinit var themeManager: ThemeManager
     private lateinit var hydrationGoalText: MaterialTextView
     private lateinit var notificationSettingsCard: MaterialCardView
@@ -41,6 +43,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         hydrationManager = HydrationManager(requireContext())
+        authManager = AuthManager(requireContext())
         themeManager = ThemeManager(requireContext())
         
         hydrationGoalText = view.findViewById(R.id.hydration_goal_text)
@@ -68,6 +71,11 @@ class SettingsFragment : Fragment() {
         
         shareDataBtn.setOnClickListener {
             shareWellnessData()
+        }
+        
+        // Add logout functionality
+        view?.findViewById<MaterialCardView>(R.id.logout_card)?.setOnClickListener {
+            showLogoutDialog()
         }
     }
     
@@ -144,6 +152,22 @@ class SettingsFragment : Fragment() {
         }
         
         startActivity(Intent.createChooser(shareIntent, "Share Wellness Data"))
+    }
+    
+    private fun showLogoutDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout? You'll need to sign in again to access your data.")
+            .setPositiveButton("Logout") { _, _ ->
+                authManager.logout()
+                // Navigate to auth activity
+                val intent = Intent(requireContext(), com.example.wellnessbuddy.AuthActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                activity?.finish()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
     
     override fun onResume() {

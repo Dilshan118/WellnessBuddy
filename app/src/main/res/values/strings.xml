@@ -62,4 +62,23 @@
     <string name="progress">Progress</string>
     <string name="completed">Completed</string>
     <string name="remaining">Remaining</string>
+    
+    <!-- Authentication -->
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="welcome_back">Welcome back!</string>
+    <string name="join_wellness">Join Wellness Buddy</string>
+    <string name="invalid_credentials">Invalid email or password</string>
+    <string name="registration_successful">Registration successful!</string>
+    <string name="login_successful">Login successful!</string>
+    <string name="password_mismatch">Passwords do not match</string>
+    <string name="email_already_exists">Email already registered</string>
+    <string name="username_taken">Username already taken</string>
+    <string name="weak_password">Password must be at least 6 characters</string>
+    <string name="invalid_email">Please enter a valid email address</string>
+    <string name="all_fields_required">All fields are required</string>
 </resources>
