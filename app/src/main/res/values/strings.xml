@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">Wellness Buddy</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_habits">Habits</string>
+    <string name="nav_mood">Mood</string>
+    <string name="nav_hydration">Hydration</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Home Dashboard -->
+    <string name="dashboard_title">Wellness Dashboard</string>
+    <string name="today_habits">Today\'s Habits</string>
+    <string name="mood_today">Today\'s Mood</string>
+    <string name="hydration_progress">Hydration Progress</string>
+    <string name="glasses_consumed">Glasses consumed</string>
+    <string name="glasses_remaining">Glasses remaining</string>
+    
+    <!-- Habits -->
+    <string name="habits_title">Daily Habits</string>
+    <string name="add_habit">Add Habit</string>
+    <string name="habit_name">Habit Name</string>
+    <string name="habit_description">Description</string>
+    <string name="target_count">Target Count</string>
+    <string name="completed_count">Completed</string>
+    <string name="mark_complete">Mark Complete</string>
+    <string name="edit_habit">Edit Habit</string>
+    <string name="delete_habit">Delete Habit</string>
+    <string name="save_habit">Save Habit</string>
+    
+    <!-- Mood Journal -->
+    <string name="mood_title">Mood Journal</string>
+    <string name="how_are_you_feeling">How are you feeling?</string>
+    <string name="add_mood">Add Mood</string>
+    <string name="mood_notes">Notes (optional)</string>
+    <string name="mood_intensity">Intensity (1-10)</string>
+    <string name="mood_history">Mood History</string>
+    <string name="mood_trends">Mood Trends</string>
+    
+    <!-- Hydration -->
+    <string name="hydration_title">Hydration Tracker</string>
+    <string name="daily_goal">Daily Goal</string>
+    <string name="reminder_interval">Reminder Interval</string>
+    <string name="add_glass">Add Glass</string>
+    <string name="remove_glass">Remove Glass</string>
+    <string name="enable_reminders">Enable Reminders</string>
+    <string name="reminder_time">Reminder Time</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="hydration_goal">Hydration Goal</string>
+    <string name="theme_settings">Theme</string>
+    <string name="about">About</string>
+    
+    <!-- Common -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="add">Add</string>
+    <string name="progress">Progress</string>
+    <string name="completed">Completed</string>
+    <string name="remaining">Remaining</string>
+</resources>

@@ -1,0 +1,19 @@
+# Gradle files
+.gradle/
+**/build/
+.idea/
+
+# Local settings
+local.properties
+
+# NDK / CMake
+.cxx/
+.externalNativeBuild/
+
+# Keys
+*.jks
+*.keystore
+
+# Misc
+.DS_Store
+captures/
