@@ -1,116 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Custom Wellness Buddy Theme -->
+    <!-- Ultra-Modern Wellness Buddy Theme -->
     <style name="WellnessBuddyTheme" parent="Theme.Material3.DayNight">
-        <!-- Primary Colors -->
-        <item name="colorPrimary">@color/wellness_primary</item>
-        <item name="colorPrimaryDark">@color/wellness_primary_dark</item>
-        
-        <!-- Background Colors -->
-        <item name="android:colorBackground">@color/wellness_background</item>
-        <item name="colorSurface">@color/wellness_surface</item>
+        <!-- Dark Theme Colors -->
+        <item name="android:colorBackground">@color/modern_background</item>
+        <item name="colorSurface">@color/modern_surface</item>
+        <item name="colorPrimary">@color/neon_primary</item>
+        <item name="colorPrimaryDark">@color/modern_background</item>
         
         <!-- Text Colors -->
-        <item name="android:textColorPrimary">@color/wellness_text_primary</item>
-        <item name="android:textColorSecondary">@color/wellness_text_secondary</item>
-        <item name="android:textColorHint">@color/wellness_text_hint</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_tertiary</item>
         
         <!-- Status Bar -->
-        <item name="android:statusBarColor">@color/wellness_primary_dark</item>
+        <item name="android:statusBarColor">@color/modern_background</item>
         <item name="android:windowLightStatusBar">false</item>
         
         <!-- Navigation Bar -->
-        <item name="android:navigationBarColor">@color/wellness_surface</item>
-        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarColor">@color/modern_background</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        
+        <!-- Window Background -->
+        <item name="android:windowBackground">@color/modern_background</item>
     </style>
     
-    <!-- Custom Text Styles -->
-    <style name="WellnessTitle" parent="android:TextAppearance">
-        <item name="android:textSize">28sp</item>
+    <!-- Modern Text Styles -->
+    <style name="ModernTitle" parent="android:TextAppearance">
+        <item name="android:textSize">32sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/wellness_text_primary</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
     
-    <style name="WellnessSubtitle" parent="android:TextAppearance">
+    <style name="ModernSubtitle" parent="android:TextAppearance">
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/wellness_text_primary</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.01</item>
     </style>
     
-    <style name="WellnessBody" parent="android:TextAppearance">
+    <style name="ModernBody" parent="android:TextAppearance">
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/wellness_text_primary</item>
+        <item name="android:textColor">@color/text_secondary</item>
         <item name="android:fontFamily">sans-serif</item>
+        <item name="android:lineSpacingExtra">4dp</item>
     </style>
     
-    <style name="WellnessCaption" parent="android:TextAppearance">
+    <style name="ModernCaption" parent="android:TextAppearance">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/wellness_text_secondary</item>
+        <item name="android:textColor">@color/text_tertiary</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
     
-    <!-- Custom Button Styles -->
-    <style name="WellnessButton" parent="Widget.Material3.Button">
+    <!-- Modern Button Styles -->
+    <style name="ModernButton" parent="Widget.Material3.Button">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="backgroundTint">@color/wellness_primary</item>
-        <item name="cornerRadius">12dp</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="backgroundTint">@color/neon_primary</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:paddingStart">32dp</item>
+        <item name="android:paddingEnd">32dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:elevation">8dp</item>
     </style>
     
-    <style name="WellnessButtonSecondary" parent="Widget.Material3.Button.OutlinedButton">
+    <style name="ModernButtonSecondary" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/wellness_primary</item>
-        <item name="strokeColor">@color/wellness_primary</item>
-        <item name="cornerRadius">12dp</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">@color/neon_primary</item>
+        <item name="strokeColor">@color/neon_primary</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:paddingStart">32dp</item>
+        <item name="android:paddingEnd">32dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:elevation">4dp</item>
     </style>
     
-    <!-- Custom Card Styles -->
-    <style name="WellnessCard" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">16dp</item>
-        <item name="cardElevation">4dp</item>
-        <item name="cardBackgroundColor">@color/wellness_card_background</item>
-        <item name="android:layout_margin">8dp</item>
+    <!-- Modern Card Styles -->
+    <style name="ModernCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">12dp</item>
+        <item name="cardBackgroundColor">@color/modern_card</item>
+        <item name="android:layout_margin">12dp</item>
+        <item name="strokeColor">@color/glass_border</item>
+        <item name="strokeWidth">1dp</item>
     </style>
     
-    <style name="WellnessCardHighlight" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">16dp</item>
-        <item name="cardElevation">8dp</item>
-        <item name="cardBackgroundColor">@color/wellness_card_background</item>
-        <item name="android:layout_margin">8dp</item>
-        <item name="strokeColor">@color/wellness_primary</item>
+    <style name="ModernCardHighlight" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">16dp</item>
+        <item name="cardBackgroundColor">@color/modern_elevated</item>
+        <item name="android:layout_margin">12dp</item>
+        <item name="strokeColor">@color/neon_primary</item>
         <item name="strokeWidth">2dp</item>
     </style>
     
-    <!-- Custom Progress Styles -->
-    <style name="WellnessProgress" parent="Widget.Material3.LinearProgressIndicator">
-        <item name="indicatorColor">@color/wellness_primary</item>
-        <item name="trackColor">@color/wellness_primary_light</item>
+    <!-- Modern Progress Styles -->
+    <style name="ModernProgress" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="indicatorColor">@color/neon_primary</item>
+        <item name="trackColor">@color/modern_surface</item>
         <item name="trackThickness">8dp</item>
+        <item name="cornerRadius">4dp</item>
     </style>
     
-    <style name="WellnessCircularProgress" parent="Widget.Material3.CircularProgressIndicator">
-        <item name="indicatorColor">@color/wellness_primary</item>
-        <item name="trackColor">@color/wellness_primary_light</item>
-        <item name="trackThickness">4dp</item>
+    <style name="ModernCircularProgress" parent="Widget.Material3.CircularProgressIndicator">
+        <item name="indicatorColor">@color/neon_primary</item>
+        <item name="trackColor">@color/modern_surface</item>
+        <item name="trackThickness">6dp</item>
     </style>
     
-    <!-- Custom Bottom Navigation -->
-    <style name="WellnessBottomNavigation" parent="Widget.Material3.BottomNavigationView">
-        <item name="itemIconTint">@color/wellness_primary</item>
-        <item name="itemTextColor">@color/wellness_primary</item>
-        <item name="android:background">@color/wellness_surface</item>
-        <item name="elevation">8dp</item>
+    <!-- Modern Bottom Navigation -->
+    <style name="ModernBottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/neon_primary</item>
+        <item name="itemTextColor">@color/text_secondary</item>
+        <item name="android:background">@color/modern_surface</item>
+        <item name="elevation">16dp</item>
+        <item name="itemActiveIndicatorStyle">@style/ModernBottomNavigationIndicator</item>
+    </style>
+    
+    <style name="ModernBottomNavigationIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/neon_primary</item>
+        <item name="android:width">64dp</item>
+        <item name="android:height">32dp</item>
+        <item name="shapeAppearance">@style/ModernBottomNavigationIndicatorShape</item>
+    </style>
+    
+    <style name="ModernBottomNavigationIndicatorShape" parent="ShapeAppearance.Material3.Corner.Full">
+        <item name="cornerSize">16dp</item>
     </style>
 </resources>
