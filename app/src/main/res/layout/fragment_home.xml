@@ -17,10 +17,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/dashboard_title"
-            android:textSize="28sp"
+            android:textSize="32sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textColor="@color/wellness_primary"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center" />
 
         <!-- Today's Habits Section -->
         <com.google.android.material.textview.MaterialTextView
@@ -54,10 +56,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/wellness_card_background"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -94,10 +98,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/wellness_card_background"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -108,11 +114,12 @@
 
                     <com.google.android.material.progressindicator.CircularProgressIndicator
                         android:id="@+id/hydration_progress"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginBottom="8dp"
-                        app:indicatorColor="@color/design_default_color_primary"
-                        app:trackColor="@android:color/darker_gray" />
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="12dp"
+                        app:indicatorColor="@color/wellness_primary"
+                        app:trackColor="@color/wellness_primary_light"
+                        app:trackThickness="6dp" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/hydration_text"
@@ -151,7 +158,12 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:text="@string/add_habit"
-                app:icon="@drawable/ic_habits" />
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:icon="@drawable/ic_habits"
+                app:backgroundTint="@color/wellness_primary"
+                app:cornerRadius="12dp"
+                app:iconTint="@android:color/white" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/add_mood_btn"
@@ -160,7 +172,12 @@
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:text="@string/add_mood"
-                app:icon="@drawable/ic_mood" />
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:icon="@drawable/ic_mood"
+                app:backgroundTint="@color/wellness_secondary"
+                app:cornerRadius="12dp"
+                app:iconTint="@android:color/white" />
 
         </LinearLayout>
 
