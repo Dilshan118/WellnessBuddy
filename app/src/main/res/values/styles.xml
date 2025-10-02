@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom Wellness Buddy Theme -->
+    <style name="WellnessBuddyTheme" parent="Theme.Material3.DayNight">
+        <!-- Primary Colors -->
+        <item name="colorPrimary">@color/wellness_primary</item>
+        <item name="colorPrimaryDark">@color/wellness_primary_dark</item>
+        
+        <!-- Background Colors -->
+        <item name="android:colorBackground">@color/wellness_background</item>
+        <item name="colorSurface">@color/wellness_surface</item>
+        
+        <!-- Text Colors -->
+        <item name="android:textColorPrimary">@color/wellness_text_primary</item>
+        <item name="android:textColorSecondary">@color/wellness_text_secondary</item>
+        <item name="android:textColorHint">@color/wellness_text_hint</item>
+        
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">@color/wellness_primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        
+        <!-- Navigation Bar -->
+        <item name="android:navigationBarColor">@color/wellness_surface</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+    
+    <!-- Custom Text Styles -->
+    <style name="WellnessTitle" parent="android:TextAppearance">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/wellness_text_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    
+    <style name="WellnessSubtitle" parent="android:TextAppearance">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/wellness_text_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    
+    <style name="WellnessBody" parent="android:TextAppearance">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/wellness_text_primary</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    
+    <style name="WellnessCaption" parent="android:TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/wellness_text_secondary</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    
+    <!-- Custom Button Styles -->
+    <style name="WellnessButton" parent="Widget.Material3.Button">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="backgroundTint">@color/wellness_primary</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+    
+    <style name="WellnessButtonSecondary" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/wellness_primary</item>
+        <item name="strokeColor">@color/wellness_primary</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+    
+    <!-- Custom Card Styles -->
+    <style name="WellnessCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardBackgroundColor">@color/wellness_card_background</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+    
+    <style name="WellnessCardHighlight" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">8dp</item>
+        <item name="cardBackgroundColor">@color/wellness_card_background</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="strokeColor">@color/wellness_primary</item>
+        <item name="strokeWidth">2dp</item>
+    </style>
+    
+    <!-- Custom Progress Styles -->
+    <style name="WellnessProgress" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="indicatorColor">@color/wellness_primary</item>
+        <item name="trackColor">@color/wellness_primary_light</item>
+        <item name="trackThickness">8dp</item>
+    </style>
+    
+    <style name="WellnessCircularProgress" parent="Widget.Material3.CircularProgressIndicator">
+        <item name="indicatorColor">@color/wellness_primary</item>
+        <item name="trackColor">@color/wellness_primary_light</item>
+        <item name="trackThickness">4dp</item>
+    </style>
+    
+    <!-- Custom Bottom Navigation -->
+    <style name="WellnessBottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/wellness_primary</item>
+        <item name="itemTextColor">@color/wellness_primary</item>
+        <item name="android:background">@color/wellness_surface</item>
+        <item name="elevation">8dp</item>
+    </style>
+</resources>
