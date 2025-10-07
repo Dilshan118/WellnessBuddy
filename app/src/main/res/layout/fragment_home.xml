@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Welcome Header with Gradient -->
+        <!-- Welcome Header with Modern Styling -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,20 +24,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/dashboard_title"
-                android:textSize="36sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:fontFamily="sans-serif-light"
-                android:letterSpacing="0.02"
+                android:textAppearance="@style/AppNameStyle"
                 android:gravity="center" />
                 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Track your wellness journey"
+                android:text="✨ Track your wellness journey ✨"
                 android:textSize="16sp"
                 android:textColor="@color/text_secondary"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:fontFamily="sans-serif"
                 android:gravity="center" />
         </LinearLayout>

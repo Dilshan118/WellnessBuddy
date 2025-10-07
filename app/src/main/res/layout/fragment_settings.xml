@@ -113,6 +113,46 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- View Onboarding Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/view_onboarding_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/neon_accent"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🎯 View Onboarding"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=">"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- About Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/about_card"
@@ -224,7 +264,7 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Version: 1.0\nBuild: Wellness Buddy\nData: Stored locally on device"
+                    android:text="Version: 1.0\nBuild: 🧘‍♀️ WellnessBuddy\nData: Stored locally on device"
                     android:textSize="14sp"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 

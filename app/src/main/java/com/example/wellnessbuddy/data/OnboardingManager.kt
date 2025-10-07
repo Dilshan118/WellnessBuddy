@@ -62,9 +62,9 @@ class OnboardingManager(private val context: Context) {
         return listOf(
             OnboardingPage(
                 id = 1,
-                title = "Welcome to Wellness Buddy",
+                title = "🌟 Welcome to WellnessBuddy",
                 description = "Your personal companion for building healthy habits and tracking your wellness journey.",
-                icon = "🧘",
+                icon = "🧘‍♀️",
                 backgroundColor = "gradient_1"
             ),
             OnboardingPage(

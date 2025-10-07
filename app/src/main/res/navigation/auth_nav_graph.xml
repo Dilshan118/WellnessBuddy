@@ -38,6 +38,6 @@
     <activity
         android:id="@+id/mainActivity"
         android:name="com.example.wellnessbuddy.MainActivity"
-        android:label="Wellness Buddy" />
+        android:label="🧘‍♀️ WellnessBuddy" />
 
 </navigation>

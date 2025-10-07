@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.example.wellnessbuddy.R
 import com.example.wellnessbuddy.data.HydrationManager
 import com.example.wellnessbuddy.data.AuthManager
+import com.example.wellnessbuddy.data.OnboardingManager
 import com.example.wellnessbuddy.theme.ThemeManager
 import com.example.wellnessbuddy.dialogs.ThemeSelectorDialog
 import com.google.android.material.button.MaterialButton
@@ -24,6 +25,7 @@ class SettingsFragment : Fragment() {
     
     private lateinit var hydrationManager: HydrationManager
     private lateinit var authManager: AuthManager
+    private lateinit var onboardingManager: OnboardingManager
     private lateinit var themeManager: ThemeManager
     private lateinit var hydrationGoalText: MaterialTextView
     private lateinit var notificationSettingsCard: MaterialCardView
@@ -44,6 +46,7 @@ class SettingsFragment : Fragment() {
         
         hydrationManager = HydrationManager(requireContext())
         authManager = AuthManager(requireContext())
+        onboardingManager = OnboardingManager(requireContext())
         themeManager = ThemeManager(requireContext())
         
         hydrationGoalText = view.findViewById(R.id.hydration_goal_text)
@@ -76,6 +79,11 @@ class SettingsFragment : Fragment() {
         // Add logout functionality
         view?.findViewById<MaterialCardView>(R.id.logout_card)?.setOnClickListener {
             showLogoutDialog()
+        }
+        
+        // Add view onboarding functionality
+        view?.findViewById<MaterialCardView>(R.id.view_onboarding_card)?.setOnClickListener {
+            showViewOnboardingDialog()
         }
     }
     
@@ -115,9 +123,9 @@ class SettingsFragment : Fragment() {
     
     private fun showAboutDialog() {
         val message = """
-            Wellness Buddy v1.0
+            🧘‍♀️ WellnessBuddy v1.0
             
-            A simple and effective wellness tracking app to help you:
+            A modern wellness tracking app to help you:
             • Track daily habits
             • Monitor your mood
             • Stay hydrated
@@ -127,7 +135,7 @@ class SettingsFragment : Fragment() {
         """.trimIndent()
         
         AlertDialog.Builder(requireContext())
-            .setTitle("About Wellness Buddy")
+            .setTitle("About WellnessBuddy")
             .setMessage(message)
             .setPositiveButton("OK", null)
             .show()
@@ -161,6 +169,22 @@ class SettingsFragment : Fragment() {
             .setPositiveButton("Logout") { _, _ ->
                 authManager.logout()
                 // Navigate to auth activity
+                val intent = Intent(requireContext(), com.example.wellnessbuddy.AuthActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                activity?.finish()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    private fun showViewOnboardingDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("View Onboarding")
+            .setMessage("Would you like to view the onboarding screens again? This will take you through the app introduction.")
+            .setPositiveButton("View Onboarding") { _, _ ->
+                // Reset onboarding state and navigate to AuthActivity
+                onboardingManager.resetOnboarding()
                 val intent = Intent(requireContext(), com.example.wellnessbuddy.AuthActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
