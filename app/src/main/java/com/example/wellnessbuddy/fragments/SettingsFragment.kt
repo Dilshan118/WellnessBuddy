@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.wellnessbuddy.R
 import com.example.wellnessbuddy.data.HydrationManager
 import com.example.wellnessbuddy.data.AuthManager
@@ -33,9 +34,11 @@ class SettingsFragment : Fragment() {
     private lateinit var sensorStatusText: MaterialTextView
     private lateinit var notificationSettingsCard: MaterialCardView
     private lateinit var themeSettingsCard: MaterialCardView
+    private lateinit var profileSettingsCard: MaterialCardView
     private lateinit var sensorSettingsCard: MaterialCardView
     private lateinit var aboutCard: MaterialCardView
     private lateinit var shareDataBtn: MaterialButton
+    private lateinit var profilePreviewText: MaterialTextView
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,8 +59,10 @@ class SettingsFragment : Fragment() {
         
         hydrationGoalText = view.findViewById(R.id.hydration_goal_text)
         sensorStatusText = view.findViewById(R.id.sensor_status_text)
+        profilePreviewText = view.findViewById(R.id.profile_preview_text)
         notificationSettingsCard = view.findViewById(R.id.notification_settings_card)
         themeSettingsCard = view.findViewById(R.id.theme_settings_card)
+        profileSettingsCard = view.findViewById(R.id.profile_settings_card)
         sensorSettingsCard = view.findViewById(R.id.sensor_settings_card)
         aboutCard = view.findViewById(R.id.about_card)
         shareDataBtn = view.findViewById(R.id.share_data_btn)
@@ -73,6 +78,10 @@ class SettingsFragment : Fragment() {
         
         themeSettingsCard.setOnClickListener {
             showThemeSelectorDialog()
+        }
+        
+        profileSettingsCard.setOnClickListener {
+            navigateToProfile()
         }
         
         sensorSettingsCard.setOnClickListener {
@@ -104,6 +113,9 @@ class SettingsFragment : Fragment() {
         
         // Update sensor status
         updateSensorStatusDisplay()
+        
+        // Update profile preview
+        updateProfilePreview()
     }
     
     private fun updateSensorStatusDisplay() {
@@ -123,6 +135,20 @@ class SettingsFragment : Fragment() {
             else -> R.color.neon_warning
         }
         sensorStatusText.setTextColor(requireContext().getColor(color))
+    }
+    
+    private fun updateProfilePreview() {
+        val currentUser = authManager.getCurrentUser()
+        if (currentUser != null) {
+            profilePreviewText.text = currentUser.username
+        } else {
+            profilePreviewText.text = "View & Edit"
+        }
+    }
+    
+    private fun navigateToProfile() {
+        // Use Navigation Component to navigate to profile
+        findNavController().navigate(R.id.action_nav_settings_to_profileFragment)
     }
     
     private fun showNotificationSettingsDialog() {

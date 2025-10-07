@@ -10,19 +10,26 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.wellnessbuddy.fragments.*
 import com.example.wellnessbuddy.sensors.WellnessSensorManager
+import com.example.wellnessbuddy.sensors.SensorMockManager
 import com.example.wellnessbuddy.data.MoodManager
 import com.example.wellnessbuddy.data.MoodEntry
 import com.example.wellnessbuddy.data.AuthManager
 import com.example.wellnessbuddy.theme.ThemeManager
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     
     private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var sensorManager: WellnessSensorManager
+    private lateinit var mockSensorManager: SensorMockManager
     private lateinit var moodManager: MoodManager
     private lateinit var themeManager: ThemeManager
     private lateinit var authManager: AuthManager
+    private lateinit var navController: NavController
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +50,15 @@ class MainActivity : AppCompatActivity() {
             return
         }
         
+        setupNavigation()
         setupBottomNavigation()
         setupTheme()
         setupSensors()
-        
-        // Load default fragment
-        if (savedInstanceState == null) {
-            loadFragment(HomeFragment())
-        }
+    }
+    
+    private fun setupNavigation() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        navController = navHostFragment.navController
     }
     
     private fun setupTheme() {
@@ -60,20 +68,32 @@ class MainActivity : AppCompatActivity() {
     
     private fun setupSensors() {
         sensorManager = WellnessSensorManager(this)
+        mockSensorManager = SensorMockManager(this)
         moodManager = MoodManager(this)
-        
-        // Setup shake detection for quick mood logging
-        sensorManager.setOnShakeDetected {
-            showQuickMoodDialog()
+
+        // Check if we should use mock sensors
+        val useMockSensors = !sensorManager.isSensorAvailable()
+
+        if (useMockSensors) {
+            // Setup mock shake detection for quick mood logging
+            mockSensorManager.setOnShakeDetected {
+                showQuickMoodDialog()
+            }
+            mockSensorManager.startListening()
+        } else {
+            // Setup real shake detection for quick mood logging
+            sensorManager.setOnShakeDetected {
+                showQuickMoodDialog()
+            }
+
+            // Setup step detection
+            sensorManager.setOnStepDetected { stepCount ->
+                // Step count is now handled by HomeFragment
+                // Could add additional logic here if needed
+            }
+
+            sensorManager.startListening()
         }
-        
-        // Setup step detection
-        sensorManager.setOnStepDetected { stepCount ->
-            // Step count is now handled by HomeFragment
-            // Could add additional logic here if needed
-        }
-        
-        sensorManager.startListening()
     }
     
     private fun showQuickMoodDialog() {
@@ -100,32 +120,7 @@ class MainActivity : AppCompatActivity() {
     
     private fun setupBottomNavigation() {
         bottomNavigation = findViewById(R.id.bottom_navigation)
-        
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    loadFragment(HomeFragment())
-                    true
-                }
-                R.id.nav_habits -> {
-                    loadFragment(HabitTrackerFragment())
-                    true
-                }
-                R.id.nav_mood -> {
-                    loadFragment(MoodJournalFragment())
-                    true
-                }
-                R.id.nav_hydration -> {
-                    loadFragment(HydrationFragment())
-                    true
-                }
-                R.id.nav_settings -> {
-                    loadFragment(SettingsFragment())
-                    true
-                }
-                else -> false
-            }
-        }
+        bottomNavigation.setupWithNavController(navController)
     }
     
     private fun loadFragment(fragment: Fragment) {
@@ -136,12 +131,22 @@ class MainActivity : AppCompatActivity() {
     
     override fun onResume() {
         super.onResume()
-        sensorManager.startListening()
+        val useMockSensors = !sensorManager.isSensorAvailable()
+        if (useMockSensors) {
+            mockSensorManager.startListening()
+        } else {
+            sensorManager.startListening()
+        }
     }
     
     override fun onPause() {
         super.onPause()
-        sensorManager.stopListening()
+        val useMockSensors = !sensorManager.isSensorAvailable()
+        if (useMockSensors) {
+            mockSensorManager.stopListening()
+        } else {
+            sensorManager.stopListening()
+        }
     }
     
     private fun navigateToAuth() {
