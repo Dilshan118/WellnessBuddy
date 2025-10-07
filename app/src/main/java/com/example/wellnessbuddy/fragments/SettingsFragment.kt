@@ -199,9 +199,12 @@ class SettingsFragment : Fragment() {
             • Track daily habits
             • Monitor your mood
             • Stay hydrated
+            • Smart sensor features (shake to log moods, auto step counting)
             • Build healthy routines
             
             Built with ❤️ for your wellness journey.
+            
+            💡 Tip: Try the "View Onboarding" option to see all features including the new sensor capabilities!
         """.trimIndent()
         
         AlertDialog.Builder(requireContext())

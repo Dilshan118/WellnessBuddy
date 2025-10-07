@@ -73,7 +73,24 @@
             android:fontFamily="sans-serif"
             android:lineSpacingExtra="8dp"
             android:gravity="center"
-            android:layout_marginBottom="60dp" />
+            android:layout_marginBottom="40dp" />
+
+        <!-- Demo Button for Sensor Features -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/demo_sensor_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Try Sensor Demo"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            app:backgroundTint="@color/neon_accent"
+            app:cornerRadius="20dp"
+            app:icon="@drawable/ic_play"
+            app:iconTint="@color/text_primary"
+            android:visibility="gone"
+            android:layout_marginBottom="20dp"
+            style="@style/Widget.Material3.Button" />
 
         <!-- Page Indicator -->
         <LinearLayout

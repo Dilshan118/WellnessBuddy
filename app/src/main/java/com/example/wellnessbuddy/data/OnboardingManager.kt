@@ -83,17 +83,24 @@ class OnboardingManager(private val context: Context) {
             ),
             OnboardingPage(
                 id = 4,
-                title = "Stay Hydrated",
-                description = "Set hydration goals and get gentle reminders to keep your body properly hydrated throughout the day.",
-                icon = "💧",
+                title = "Smart Sensor Features",
+                description = "📳 Shake your device to instantly log moods\n👟 Walk around to automatically count steps\n📊 Real-time activity tracking on your dashboard\n⚡ Seamless integration with all wellness features",
+                icon = "📱",
                 backgroundColor = "gradient_1"
             ),
             OnboardingPage(
                 id = 5,
+                title = "Stay Hydrated",
+                description = "Set hydration goals and get gentle reminders to keep your body properly hydrated throughout the day.",
+                icon = "💧",
+                backgroundColor = "gradient_2"
+            ),
+            OnboardingPage(
+                id = 6,
                 title = "Ready to Begin?",
-                description = "You're all set! Create your account and start your wellness journey with personalized tracking and insights.",
+                description = "You're all set! Create your account and start your wellness journey with personalized tracking, smart sensors, and actionable insights.",
                 icon = "🚀",
-                backgroundColor = "gradient_2",
+                backgroundColor = "gradient_3",
                 isLastPage = true
             )
         )

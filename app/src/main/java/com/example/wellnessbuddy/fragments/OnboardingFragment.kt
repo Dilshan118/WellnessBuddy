@@ -12,8 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.wellnessbuddy.R
 import com.example.wellnessbuddy.data.OnboardingPage
+import com.example.wellnessbuddy.data.MoodEntry
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
+import androidx.appcompat.app.AlertDialog
 
 /**
  * Fragment for displaying onboarding screens
@@ -28,9 +30,10 @@ class OnboardingFragment : Fragment() {
     private lateinit var previousButton: MaterialButton
     private lateinit var nextButton: MaterialButton
     private lateinit var gradientBackground: View
+    private lateinit var demoSensorBtn: MaterialButton
     
     private var currentPageIndex = 0
-    private var totalPages = 5
+    private var totalPages = 6
     private var onboardingPages: List<OnboardingPage> = emptyList()
     
     override fun onCreateView(
@@ -53,6 +56,7 @@ class OnboardingFragment : Fragment() {
         previousButton = view.findViewById(R.id.previous_button)
         nextButton = view.findViewById(R.id.next_button)
         gradientBackground = view.findViewById(R.id.gradient_background)
+        demoSensorBtn = view.findViewById(R.id.demo_sensor_btn)
         
         // Get onboarding pages
         onboardingPages = com.example.wellnessbuddy.data.OnboardingManager(requireContext()).getOnboardingPages()
@@ -83,6 +87,10 @@ class OnboardingFragment : Fragment() {
                 navigateToNext()
             }
         }
+        
+        demoSensorBtn.setOnClickListener {
+            showSensorDemo()
+        }
     }
     
     private fun loadPageData() {
@@ -106,6 +114,9 @@ class OnboardingFragment : Fragment() {
             
             // Show/hide previous button
             previousButton.visibility = if (currentPageIndex > 0) View.VISIBLE else View.GONE
+            
+            // Show/hide demo button only on sensor features page (page 4, index 3)
+            demoSensorBtn.visibility = if (currentPageIndex == 3) View.VISIBLE else View.GONE
             
             // Update gradient background based on page
             updateGradientBackground(page.backgroundColor)
@@ -212,5 +223,67 @@ class OnboardingFragment : Fragment() {
         // Complete onboarding before navigating
         (requireActivity() as com.example.wellnessbuddy.AuthActivity).completeOnboarding()
         findNavController().navigate(R.id.action_onboardingFragment_to_loginFragment)
+    }
+    
+    private fun showSensorDemo() {
+        // Create a demo dialog showing sensor features
+        val demoMessage = """
+            📱 Sensor Features Demo
+            
+            🎯 What you can do with sensors:
+            
+            📳 SHAKE DETECTION
+            • Shake your device to instantly log moods
+            • Quick mood logging without opening the app
+            • Visual feedback when shake is detected
+            
+            👟 STEP COUNTING
+            • Walk around with your device to count steps
+            • Automatic step tracking throughout the day
+            • Real-time step count on your dashboard
+            
+            📊 LIVE MONITORING
+            • Real-time acceleration display
+            • Color-coded activity levels
+            • Seamless integration with all features
+            
+            💡 Tips for best experience:
+            • Hold device naturally while walking
+            • Shake firmly for mood detection
+            • Check dashboard for real-time updates
+            
+            Ready to try these features in the main app?
+        """.trimIndent()
+        
+        AlertDialog.Builder(requireContext())
+            .setTitle("🧪 Sensor Demo")
+            .setMessage(demoMessage)
+            .setPositiveButton("Awesome!") { _, _ ->
+                // Show a quick mood demo
+                showMoodDemo()
+            }
+            .setNegativeButton("Learn More") { _, _ ->
+                // Could navigate to help section or show more info
+            }
+            .show()
+    }
+    
+    private fun showMoodDemo() {
+        val moodOptions = MoodEntry.MOOD_OPTIONS
+        val moodNames = moodOptions.map { "${it.emoji} ${it.name}" }.toTypedArray()
+        
+        AlertDialog.Builder(requireContext())
+            .setTitle("📳 Shake Demo - Quick Mood Log")
+            .setMessage("This is how quick mood logging works! Select a mood to see the demo:")
+            .setItems(moodNames) { _, which ->
+                val selectedMood = moodOptions[which]
+                AlertDialog.Builder(requireContext())
+                    .setTitle("✅ Mood Logged!")
+                    .setMessage("${selectedMood.emoji} ${selectedMood.name} logged successfully!\n\nIn the main app, this would be saved to your mood history and you could add notes too.")
+                    .setPositiveButton("Cool!") { _, _ -> }
+                    .show()
+            }
+            .setNegativeButton("Skip Demo", null)
+            .show()
     }
 }
