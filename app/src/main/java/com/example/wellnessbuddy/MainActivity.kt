@@ -68,8 +68,9 @@ class MainActivity : AppCompatActivity() {
         }
         
         // Setup step detection
-        sensorManager.setOnStepDetected {
-            // Could update step count in habits or show notification
+        sensorManager.setOnStepDetected { stepCount ->
+            // Step count is now handled by HomeFragment
+            // Could add additional logic here if needed
         }
         
         sensorManager.startListening()

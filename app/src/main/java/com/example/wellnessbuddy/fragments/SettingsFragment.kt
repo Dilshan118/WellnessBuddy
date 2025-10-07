@@ -14,6 +14,7 @@ import com.example.wellnessbuddy.data.AuthManager
 import com.example.wellnessbuddy.data.OnboardingManager
 import com.example.wellnessbuddy.theme.ThemeManager
 import com.example.wellnessbuddy.dialogs.ThemeSelectorDialog
+import com.example.wellnessbuddy.sensors.WellnessSensorManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textview.MaterialTextView
@@ -27,9 +28,12 @@ class SettingsFragment : Fragment() {
     private lateinit var authManager: AuthManager
     private lateinit var onboardingManager: OnboardingManager
     private lateinit var themeManager: ThemeManager
+    private lateinit var sensorManager: WellnessSensorManager
     private lateinit var hydrationGoalText: MaterialTextView
+    private lateinit var sensorStatusText: MaterialTextView
     private lateinit var notificationSettingsCard: MaterialCardView
     private lateinit var themeSettingsCard: MaterialCardView
+    private lateinit var sensorSettingsCard: MaterialCardView
     private lateinit var aboutCard: MaterialCardView
     private lateinit var shareDataBtn: MaterialButton
     
@@ -48,10 +52,13 @@ class SettingsFragment : Fragment() {
         authManager = AuthManager(requireContext())
         onboardingManager = OnboardingManager(requireContext())
         themeManager = ThemeManager(requireContext())
+        sensorManager = WellnessSensorManager(requireContext())
         
         hydrationGoalText = view.findViewById(R.id.hydration_goal_text)
+        sensorStatusText = view.findViewById(R.id.sensor_status_text)
         notificationSettingsCard = view.findViewById(R.id.notification_settings_card)
         themeSettingsCard = view.findViewById(R.id.theme_settings_card)
+        sensorSettingsCard = view.findViewById(R.id.sensor_settings_card)
         aboutCard = view.findViewById(R.id.about_card)
         shareDataBtn = view.findViewById(R.id.share_data_btn)
         
@@ -66,6 +73,10 @@ class SettingsFragment : Fragment() {
         
         themeSettingsCard.setOnClickListener {
             showThemeSelectorDialog()
+        }
+        
+        sensorSettingsCard.setOnClickListener {
+            showSensorSettingsDialog()
         }
         
         aboutCard.setOnClickListener {
@@ -90,6 +101,28 @@ class SettingsFragment : Fragment() {
     private fun loadSettings() {
         val hydrationSettings = hydrationManager.loadSettings()
         hydrationGoalText.text = "${hydrationSettings.dailyGoal} glasses per day"
+        
+        // Update sensor status
+        updateSensorStatusDisplay()
+    }
+    
+    private fun updateSensorStatusDisplay() {
+        val isAvailable = sensorManager.isSensorAvailable()
+        val isActive = sensorManager.isCurrentlyListening()
+        
+        sensorStatusText.text = when {
+            !isAvailable -> "Not Available"
+            isActive -> "Active"
+            else -> "Inactive"
+        }
+        
+        // Update text color based on status
+        val color = when {
+            !isAvailable -> R.color.status_error
+            isActive -> R.color.neon_success
+            else -> R.color.neon_warning
+        }
+        sensorStatusText.setTextColor(requireContext().getColor(color))
     }
     
     private fun showNotificationSettingsDialog() {
@@ -119,6 +152,43 @@ class SettingsFragment : Fragment() {
             activity?.recreate()
         }
         dialog.show(parentFragmentManager, "theme_selector")
+    }
+    
+    private fun showSensorSettingsDialog() {
+        val isAvailable = sensorManager.isSensorAvailable()
+        val isActive = sensorManager.isCurrentlyListening()
+        val stepCount = sensorManager.getStepCount()
+        val lastAcceleration = sensorManager.getLastAcceleration()
+        
+        val message = """
+            📱 Sensor Information
+            
+            Status: ${if (isAvailable) "Available" else "Not Available"}
+            Active: ${if (isActive) "Yes" else "No"}
+            
+            📊 Current Data:
+            • Steps Today: $stepCount
+            • Last Acceleration: ${String.format("%.1f", lastAcceleration)} m/s²
+            
+            ⚙️ Settings:
+            • Shake Threshold: ${sensorManager.getShakeThreshold()} m/s²
+            • Step Threshold: ${sensorManager.getStepThreshold()} m/s²
+            
+            💡 Tips:
+            • Shake your device to log moods quickly
+            • Walk with your device to count steps
+            • Sensors help track your activity automatically
+        """.trimIndent()
+        
+        AlertDialog.Builder(requireContext())
+            .setTitle("📱 Sensor Settings")
+            .setMessage(message)
+            .setPositiveButton("Reset Steps") { _, _ ->
+                sensorManager.resetStepCount()
+                updateSensorStatusDisplay()
+            }
+            .setNegativeButton("Close", null)
+            .show()
     }
     
     private fun showAboutDialog() {
@@ -197,5 +267,6 @@ class SettingsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         loadSettings()
+        updateSensorStatusDisplay()
     }
 }

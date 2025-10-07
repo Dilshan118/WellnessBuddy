@@ -14,12 +14,14 @@ import com.example.wellnessbuddy.data.MoodEntry
 import com.example.wellnessbuddy.data.MoodManager
 import com.example.wellnessbuddy.data.HydrationSettings
 import com.example.wellnessbuddy.data.HydrationManager
+import com.example.wellnessbuddy.sensors.WellnessSensorManager
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.textview.MaterialTextView
 import com.google.android.material.button.MaterialButton
 import java.text.SimpleDateFormat
 import java.util.*
+import java.text.DecimalFormat
 
 /**
  * Home Dashboard Fragment - Overview of habits, moods, and hydration
@@ -29,6 +31,7 @@ class HomeFragment : Fragment() {
     private lateinit var habitManager: HabitManager
     private lateinit var moodManager: MoodManager
     private lateinit var hydrationManager: HydrationManager
+    private lateinit var sensorManager: WellnessSensorManager
     
     private lateinit var habitsRecyclerView: RecyclerView
     private lateinit var moodCard: MaterialCardView
@@ -37,6 +40,15 @@ class HomeFragment : Fragment() {
     private lateinit var hydrationText: MaterialTextView
     private lateinit var addHabitBtn: MaterialButton
     private lateinit var addMoodBtn: MaterialButton
+    
+    // Sensor UI elements
+    private lateinit var stepsCount: MaterialTextView
+    private lateinit var sensorStatus: MaterialTextView
+    private lateinit var accelerationValue: MaterialTextView
+    private lateinit var resetStepsBtn: MaterialButton
+    private lateinit var sensorCard: MaterialCardView
+    
+    private val decimalFormat = DecimalFormat("#0.0")
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +65,7 @@ class HomeFragment : Fragment() {
         habitManager = HabitManager(requireContext())
         moodManager = MoodManager(requireContext())
         hydrationManager = HydrationManager(requireContext())
+        sensorManager = WellnessSensorManager(requireContext())
         
         // Initialize views
         habitsRecyclerView = view.findViewById(R.id.habits_recycler_view)
@@ -62,6 +75,13 @@ class HomeFragment : Fragment() {
         hydrationText = view.findViewById(R.id.hydration_text)
         addHabitBtn = view.findViewById<MaterialButton>(R.id.add_habit_btn)
         addMoodBtn = view.findViewById<MaterialButton>(R.id.add_mood_btn)
+        
+        // Initialize sensor views
+        stepsCount = view.findViewById(R.id.steps_count)
+        sensorStatus = view.findViewById(R.id.sensor_status)
+        accelerationValue = view.findViewById(R.id.acceleration_value)
+        resetStepsBtn = view.findViewById(R.id.reset_steps_btn)
+        sensorCard = view.findViewById(R.id.sensor_card)
         
         setupViews()
         loadData()
@@ -103,6 +123,9 @@ class HomeFragment : Fragment() {
                     .selectedItemId = R.id.nav_mood
             }
         }
+        
+        // Setup sensor UI
+        setupSensorUI()
     }
     
     private fun loadData() {
@@ -176,8 +199,105 @@ class HomeFragment : Fragment() {
         hydrationText.text = "${settings.glassesConsumed}/${settings.dailyGoal} glasses"
     }
     
+    private fun setupSensorUI() {
+        // Setup sensor callbacks
+        sensorManager.setOnStepDetected { stepCount ->
+            updateStepCount(stepCount)
+        }
+        
+        sensorManager.setOnSensorStatusChanged { isActive ->
+            updateSensorStatus(isActive)
+        }
+        
+        sensorManager.setOnAccelerationChanged { acceleration ->
+            updateAccelerationDisplay(acceleration)
+        }
+        
+        sensorManager.setOnShakeDetected {
+            // Shake detected - this will be handled by MainActivity
+            // Just show a visual feedback here
+            showShakeFeedback()
+        }
+        
+        // Setup reset steps button
+        resetStepsBtn.setOnClickListener {
+            sensorManager.resetStepCount()
+        }
+        
+        // Initialize sensor display
+        updateStepCount(sensorManager.getStepCount())
+        updateSensorStatus(sensorManager.isCurrentlyListening())
+        updateAccelerationDisplay(sensorManager.getLastAcceleration())
+        
+        // Start sensor listening if available
+        if (sensorManager.isSensorAvailable()) {
+            sensorManager.startListening()
+        } else {
+            updateSensorStatus(false)
+            sensorStatus.text = "❌"
+            sensorStatus.contentDescription = "Sensor not available"
+        }
+    }
+    
+    private fun updateStepCount(count: Int) {
+        stepsCount.text = count.toString()
+    }
+    
+    private fun updateSensorStatus(isActive: Boolean) {
+        sensorStatus.text = if (isActive) "🟢" else "🔴"
+        sensorStatus.contentDescription = if (isActive) "Sensor active" else "Sensor inactive"
+        
+        // Update sensor card background based on status
+        sensorCard.setCardBackgroundColor(
+            if (isActive) {
+                requireContext().getColor(R.color.modern_card)
+            } else {
+                requireContext().getColor(R.color.modern_surface)
+            }
+        )
+    }
+    
+    private fun updateAccelerationDisplay(acceleration: Float) {
+        accelerationValue.text = "${decimalFormat.format(acceleration)} m/s²"
+        
+        // Change color based on acceleration level
+        val color = when {
+            acceleration > sensorManager.getShakeThreshold() -> R.color.status_error
+            acceleration > sensorManager.getStepThreshold() -> R.color.neon_warning
+            else -> R.color.neon_primary
+        }
+        accelerationValue.setTextColor(requireContext().getColor(color))
+    }
+    
+    private fun showShakeFeedback() {
+        // Add visual feedback for shake detection
+        sensorCard.animate()
+            .scaleX(1.05f)
+            .scaleY(1.05f)
+            .setDuration(100)
+            .withEndAction {
+                sensorCard.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(100)
+                    .start()
+            }
+            .start()
+    }
+    
     override fun onResume() {
         super.onResume()
         loadData() // Refresh data when returning to this fragment
+        
+        // Restart sensor listening
+        if (sensorManager.isSensorAvailable()) {
+            sensorManager.startListening()
+        }
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        // Stop sensor listening to save battery
+        sensorManager.stopListening()
     }
 }

@@ -7,10 +7,12 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import kotlin.math.sqrt
 
 /**
  * Manages accelerometer sensor for step counting and shake detection
+ * with UI display functionality
  */
 class WellnessSensorManager(private val context: Context) : SensorEventListener {
     
@@ -26,33 +28,79 @@ class WellnessSensorManager(private val context: Context) : SensorEventListener 
     private val stepThreshold = 12.0f
     private val stepDelay = 300L // 300ms between steps
     
+    // UI callback functions
     private var onShakeDetected: (() -> Unit)? = null
-    private var onStepDetected: (() -> Unit)? = null
+    private var onStepDetected: ((Int) -> Unit)? = null
+    private var onSensorStatusChanged: ((Boolean) -> Unit)? = null
+    private var onAccelerationChanged: ((Float) -> Unit)? = null
     
     private val handler = Handler(Looper.getMainLooper())
+    
+    // Sensor status tracking
+    private var isListening = false
+    private var lastAcceleration = 0.0f
     
     fun setOnShakeDetected(callback: () -> Unit) {
         onShakeDetected = callback
     }
     
-    fun setOnStepDetected(callback: () -> Unit) {
+    fun setOnStepDetected(callback: (Int) -> Unit) {
         onStepDetected = callback
+    }
+    
+    fun setOnSensorStatusChanged(callback: (Boolean) -> Unit) {
+        onSensorStatusChanged = callback
+    }
+    
+    fun setOnAccelerationChanged(callback: (Float) -> Unit) {
+        onAccelerationChanged = callback
     }
     
     fun startListening() {
         accelerometer?.let {
             sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+            isListening = true
+            onSensorStatusChanged?.invoke(true)
+            Log.d("Sensor", "Started listening to accelerometer")
+        } ?: run {
+            Log.w("Sensor", "Accelerometer not available on this device")
+            onSensorStatusChanged?.invoke(false)
         }
     }
     
     fun stopListening() {
         sensorManager.unregisterListener(this)
+        isListening = false
+        onSensorStatusChanged?.invoke(false)
+        Log.d("Sensor", "Stopped listening to accelerometer")
     }
     
     fun getStepCount(): Int = stepCount
     
     fun resetStepCount() {
         stepCount = 0
+        onStepDetected?.invoke(stepCount)
+        Log.d("Sensor", "Step count reset to 0")
+    }
+    
+    fun isSensorAvailable(): Boolean {
+        return accelerometer != null
+    }
+    
+    fun isCurrentlyListening(): Boolean {
+        return isListening
+    }
+    
+    fun getLastAcceleration(): Float {
+        return lastAcceleration
+    }
+    
+    fun getShakeThreshold(): Float {
+        return shakeThreshold
+    }
+    
+    fun getStepThreshold(): Float {
+        return stepThreshold
     }
     
     override fun onSensorChanged(event: SensorEvent?) {
@@ -63,6 +111,10 @@ class WellnessSensorManager(private val context: Context) : SensorEventListener 
                 val z = sensorEvent.values[2]
                 
                 val acceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
+                lastAcceleration = acceleration
+                
+                // Notify UI of acceleration changes
+                onAccelerationChanged?.invoke(acceleration)
                 
                 // Detect shake
                 detectShake(acceleration)
@@ -90,8 +142,9 @@ class WellnessSensorManager(private val context: Context) : SensorEventListener 
         if (acceleration > stepThreshold && currentTime - lastStepTime > stepDelay) {
             lastStepTime = currentTime
             stepCount++
+            Log.d("Sensor", "Step detected! Total steps: $stepCount")
             handler.post {
-                onStepDetected?.invoke()
+                onStepDetected?.invoke(stepCount)
             }
         }
     }
