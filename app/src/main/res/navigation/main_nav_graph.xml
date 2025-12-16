@@ -59,6 +59,10 @@
         <action
             android:id="@+id/action_nav_hydration_to_nav_home"
             app:destination="@id/nav_home" />
+            
+        <action
+            android:id="@+id/action_nav_hydration_to_nav_settings"
+            app:destination="@id/nav_settings" />
     </fragment>
 
     <fragment

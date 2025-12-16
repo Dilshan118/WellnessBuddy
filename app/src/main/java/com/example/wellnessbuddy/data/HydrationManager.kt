@@ -12,6 +12,7 @@ class HydrationManager(private val context: Context) {
     companion object {
         private const val DAILY_GOAL_KEY = "daily_goal"
         private const val REMINDER_INTERVAL_KEY = "reminder_interval"
+        private const val REMINDER_INTERVAL_TYPE_KEY = "reminder_interval_type"
         private const val IS_ENABLED_KEY = "is_enabled"
         private const val START_TIME_KEY = "start_time"
         private const val END_TIME_KEY = "end_time"
@@ -24,9 +25,17 @@ class HydrationManager(private val context: Context) {
      * Load hydration settings from SharedPreferences
      */
     fun loadSettings(): HydrationSettings {
+        val intervalTypeString = prefs.getString(REMINDER_INTERVAL_TYPE_KEY, ReminderIntervalType.MINUTES.name)
+        val intervalType = try {
+            ReminderIntervalType.valueOf(intervalTypeString ?: ReminderIntervalType.MINUTES.name)
+        } catch (e: IllegalArgumentException) {
+            ReminderIntervalType.MINUTES
+        }
+        
         return HydrationSettings(
             dailyGoal = prefs.getInt(DAILY_GOAL_KEY, 8),
-            reminderInterval = prefs.getInt(REMINDER_INTERVAL_KEY, 2),
+            reminderInterval = prefs.getInt(REMINDER_INTERVAL_KEY, 120), // Default 120 minutes (2 hours)
+            reminderIntervalType = intervalType,
             isEnabled = prefs.getBoolean(IS_ENABLED_KEY, true),
             startTime = prefs.getString(START_TIME_KEY, "08:00") ?: "08:00",
             endTime = prefs.getString(END_TIME_KEY, "22:00") ?: "22:00",
@@ -42,6 +51,7 @@ class HydrationManager(private val context: Context) {
         prefs.edit()
             .putInt(DAILY_GOAL_KEY, settings.dailyGoal)
             .putInt(REMINDER_INTERVAL_KEY, settings.reminderInterval)
+            .putString(REMINDER_INTERVAL_TYPE_KEY, settings.reminderIntervalType.name)
             .putBoolean(IS_ENABLED_KEY, settings.isEnabled)
             .putString(START_TIME_KEY, settings.startTime)
             .putString(END_TIME_KEY, settings.endTime)
@@ -103,7 +113,7 @@ class HydrationManager(private val context: Context) {
         
         val currentTime = System.currentTimeMillis()
         val timeSinceLastReminder = currentTime - settings.lastReminderTime
-        val reminderIntervalMs = settings.reminderInterval * 60 * 60 * 1000L // Convert hours to ms
+        val reminderIntervalMs = settings.getReminderIntervalMs()
         
         return timeSinceLastReminder >= reminderIntervalMs
     }

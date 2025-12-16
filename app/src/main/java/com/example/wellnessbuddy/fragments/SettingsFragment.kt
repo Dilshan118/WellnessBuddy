@@ -13,6 +13,9 @@ import com.example.wellnessbuddy.R
 import com.example.wellnessbuddy.data.HydrationManager
 import com.example.wellnessbuddy.data.AuthManager
 import com.example.wellnessbuddy.data.OnboardingManager
+import com.example.wellnessbuddy.data.HydrationSettings
+import com.example.wellnessbuddy.data.ReminderIntervalType
+import com.example.wellnessbuddy.notifications.HydrationReminderManager
 import com.example.wellnessbuddy.theme.ThemeManager
 import com.example.wellnessbuddy.dialogs.ThemeSelectorDialog
 import com.example.wellnessbuddy.sensors.WellnessSensorManager
@@ -30,6 +33,7 @@ class SettingsFragment : Fragment() {
     private lateinit var onboardingManager: OnboardingManager
     private lateinit var themeManager: ThemeManager
     private lateinit var sensorManager: WellnessSensorManager
+    private lateinit var reminderManager: HydrationReminderManager
     private lateinit var hydrationGoalText: MaterialTextView
     private lateinit var sensorStatusText: MaterialTextView
     private lateinit var notificationSettingsCard: MaterialCardView
@@ -56,6 +60,7 @@ class SettingsFragment : Fragment() {
         onboardingManager = OnboardingManager(requireContext())
         themeManager = ThemeManager(requireContext())
         sensorManager = WellnessSensorManager(requireContext())
+        reminderManager = HydrationReminderManager(requireContext())
         
         hydrationGoalText = view.findViewById(R.id.hydration_goal_text)
         sensorStatusText = view.findViewById(R.id.sensor_status_text)
@@ -109,7 +114,7 @@ class SettingsFragment : Fragment() {
     
     private fun loadSettings() {
         val hydrationSettings = hydrationManager.loadSettings()
-        hydrationGoalText.text = "${hydrationSettings.dailyGoal} glasses per day"
+        hydrationGoalText.text = "${hydrationSettings.dailyGoal} glasses • ${hydrationSettings.getFormattedReminderInterval()}"
         
         // Update sensor status
         updateSensorStatusDisplay()
@@ -153,18 +158,157 @@ class SettingsFragment : Fragment() {
     
     private fun showNotificationSettingsDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_notification_settings, null)
-        val hydrationGoalEditText = dialogView.findViewById<EditText>(R.id.hydration_goal_edit)
-        
         val currentSettings = hydrationManager.loadSettings()
-        hydrationGoalEditText.setText(currentSettings.dailyGoal.toString())
+        
+        // Initialize views
+        val hydrationGoalEdit = dialogView.findViewById<EditText>(R.id.hydration_goal_edit)
+        val minutesBtn = dialogView.findViewById<MaterialButton>(R.id.minutes_btn)
+        val hoursBtn = dialogView.findViewById<MaterialButton>(R.id.hours_btn)
+        val reminderIntervalEdit = dialogView.findViewById<EditText>(R.id.reminder_interval_edit)
+        val intervalSuffixLayout = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.interval_suffix_layout)
+        val startTimeBtn = dialogView.findViewById<MaterialButton>(R.id.start_time_btn)
+        val endTimeBtn = dialogView.findViewById<MaterialButton>(R.id.end_time_btn)
+        val reminderEnabledSwitch = dialogView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.reminder_enabled_switch)
+        
+        // Quick preset buttons
+        val preset15minBtn = dialogView.findViewById<MaterialButton>(R.id.preset_15min_btn)
+        val preset30minBtn = dialogView.findViewById<MaterialButton>(R.id.preset_30min_btn)
+        val preset1hrBtn = dialogView.findViewById<MaterialButton>(R.id.preset_1hr_btn)
+        val preset2hrBtn = dialogView.findViewById<MaterialButton>(R.id.preset_2hr_btn)
+        
+        // Test notification button
+        val testNotificationBtn = dialogView.findViewById<MaterialButton>(R.id.test_notification_btn)
+        
+        // Load current settings
+        hydrationGoalEdit.setText(currentSettings.dailyGoal.toString())
+        reminderIntervalEdit.setText(currentSettings.getReminderIntervalValue().toString())
+        startTimeBtn.text = currentSettings.startTime
+        endTimeBtn.text = currentSettings.endTime
+        reminderEnabledSwitch.isChecked = currentSettings.isEnabled
+        
+        // Set initial interval type
+        updateIntervalTypeUI(currentSettings.reminderIntervalType, minutesBtn, hoursBtn, intervalSuffixLayout)
+        
+        // Interval type button listeners
+        minutesBtn.setOnClickListener {
+            updateIntervalTypeUI(ReminderIntervalType.MINUTES, minutesBtn, hoursBtn, intervalSuffixLayout)
+        }
+        
+        hoursBtn.setOnClickListener {
+            updateIntervalTypeUI(ReminderIntervalType.HOURS, minutesBtn, hoursBtn, intervalSuffixLayout)
+        }
+        
+        // Quick preset button listeners
+        preset15minBtn.setOnClickListener {
+            updateIntervalTypeUI(ReminderIntervalType.MINUTES, minutesBtn, hoursBtn, intervalSuffixLayout)
+            reminderIntervalEdit.setText("15")
+        }
+        
+        preset30minBtn.setOnClickListener {
+            updateIntervalTypeUI(ReminderIntervalType.MINUTES, minutesBtn, hoursBtn, intervalSuffixLayout)
+            reminderIntervalEdit.setText("30")
+        }
+        
+        preset1hrBtn.setOnClickListener {
+            updateIntervalTypeUI(ReminderIntervalType.HOURS, minutesBtn, hoursBtn, intervalSuffixLayout)
+            reminderIntervalEdit.setText("1")
+        }
+        
+        preset2hrBtn.setOnClickListener {
+            updateIntervalTypeUI(ReminderIntervalType.HOURS, minutesBtn, hoursBtn, intervalSuffixLayout)
+            reminderIntervalEdit.setText("2")
+        }
+        
+        // Time picker listeners
+        startTimeBtn.setOnClickListener {
+            showTimePickerDialog("Start Time") { time ->
+                startTimeBtn.text = time
+            }
+        }
+        
+        endTimeBtn.setOnClickListener {
+            showTimePickerDialog("End Time") { time ->
+                endTimeBtn.text = time
+            }
+        }
+        
+        // Test notification button
+        testNotificationBtn.setOnClickListener {
+            try {
+                if (::reminderManager.isInitialized) {
+                    // Check and request notification permissions for Android 13+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        if (androidx.core.content.ContextCompat.checkSelfPermission(
+                                requireContext(),
+                                android.Manifest.permission.POST_NOTIFICATIONS
+                            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                        ) {
+                            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
+                            android.widget.Toast.makeText(requireContext(), "Please grant notification permission and try again", android.widget.Toast.LENGTH_LONG).show()
+                            return@setOnClickListener
+                        }
+                    }
+                    reminderManager.showHydrationNotification()
+                    
+                    // Show debug info
+                    val status = reminderManager.checkNotificationStatus()
+                    android.util.Log.d("SettingsFragment", "Notification Status:\n$status")
+                    
+                    android.widget.Toast.makeText(requireContext(), "Test notification sent! Check your notification panel", android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    android.widget.Toast.makeText(requireContext(), "Reminder manager not ready", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsFragment", "Error showing test notification", e)
+                android.widget.Toast.makeText(requireContext(), "Error showing notification", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
         
         AlertDialog.Builder(requireContext())
-            .setTitle("Notification Settings")
+            .setTitle("💧 Hydration Reminder Settings")
             .setView(dialogView)
             .setPositiveButton("Save") { _, _ ->
-                val dailyGoal = hydrationGoalEditText.text.toString().toIntOrNull() ?: 8
-                val newSettings = currentSettings.copy(dailyGoal = dailyGoal)
-                hydrationManager.saveSettings(newSettings)
+                val goal = hydrationGoalEdit.text.toString().toIntOrNull() ?: 8
+                val interval = reminderIntervalEdit.text.toString().toIntOrNull() ?: 120
+                val intervalType = if (minutesBtn.backgroundTintList == requireContext().getColorStateList(R.color.neon_primary)) {
+                    ReminderIntervalType.MINUTES
+                } else {
+                    ReminderIntervalType.HOURS
+                }
+                
+                val updatedSettings = currentSettings.copy(
+                    dailyGoal = goal,
+                    reminderInterval = interval,
+                    reminderIntervalType = intervalType,
+                    startTime = startTimeBtn.text.toString(),
+                    endTime = endTimeBtn.text.toString(),
+                    isEnabled = reminderEnabledSwitch.isChecked
+                )
+                
+                hydrationManager.saveSettings(updatedSettings)
+                
+                // Schedule or cancel reminders based on settings
+                try {
+                    if (::reminderManager.isInitialized) {
+                        if (updatedSettings.isEnabled) {
+                            reminderManager.scheduleReminders()
+                            // For testing: show a notification immediately if interval is very short
+                            if (updatedSettings.reminderIntervalType == ReminderIntervalType.MINUTES && 
+                                updatedSettings.reminderInterval <= 5) {
+                                reminderManager.showHydrationNotification()
+                            }
+                        } else {
+                            reminderManager.cancelReminders()
+                        }
+                    } else {
+                        android.util.Log.w("SettingsFragment", "ReminderManager not initialized")
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsFragment", "Error managing reminders", e)
+                    // Show a simple toast to user
+                    android.widget.Toast.makeText(requireContext(), "Settings saved, but there was an issue with reminders", android.widget.Toast.LENGTH_SHORT).show()
+                }
+                
                 loadSettings()
             }
             .setNegativeButton("Cancel", null)
@@ -297,5 +441,42 @@ class SettingsFragment : Fragment() {
         super.onResume()
         loadSettings()
         updateSensorStatusDisplay()
+    }
+    
+    private fun updateIntervalTypeUI(
+        type: ReminderIntervalType,
+        minutesBtn: MaterialButton,
+        hoursBtn: MaterialButton,
+        intervalSuffixLayout: com.google.android.material.textfield.TextInputLayout
+    ) {
+        when (type) {
+            ReminderIntervalType.MINUTES -> {
+                minutesBtn.backgroundTintList = requireContext().getColorStateList(R.color.neon_primary)
+                minutesBtn.setTextColor(requireContext().getColor(R.color.text_primary))
+                hoursBtn.backgroundTintList = requireContext().getColorStateList(R.color.modern_surface)
+                hoursBtn.setTextColor(requireContext().getColor(R.color.text_secondary))
+                intervalSuffixLayout.suffixText = " min"
+            }
+            ReminderIntervalType.HOURS -> {
+                hoursBtn.backgroundTintList = requireContext().getColorStateList(R.color.neon_primary)
+                hoursBtn.setTextColor(requireContext().getColor(R.color.text_primary))
+                minutesBtn.backgroundTintList = requireContext().getColorStateList(R.color.modern_surface)
+                minutesBtn.setTextColor(requireContext().getColor(R.color.text_secondary))
+                intervalSuffixLayout.suffixText = " hr"
+            }
+        }
+    }
+    
+    private fun showTimePickerDialog(title: String, onTimeSelected: (String) -> Unit) {
+        val timePickerDialog = android.app.TimePickerDialog(
+            requireContext(),
+            { _, hourOfDay, minute ->
+                val timeString = String.format("%02d:%02d", hourOfDay, minute)
+                onTimeSelected(timeString)
+            },
+            8, 0, true
+        )
+        timePickerDialog.setTitle(title)
+        timePickerDialog.show()
     }
 }

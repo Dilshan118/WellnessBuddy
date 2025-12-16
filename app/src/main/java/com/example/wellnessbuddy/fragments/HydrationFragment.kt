@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.wellnessbuddy.R
 import com.example.wellnessbuddy.data.HydrationManager
 import com.example.wellnessbuddy.data.HydrationSettings
@@ -99,53 +100,13 @@ class HydrationFragment : Fragment() {
     }
     
     private fun showSettingsDialog() {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_hydration_settings, null)
-        val dailyGoalEditText = dialogView.findViewById<EditText>(R.id.daily_goal_edit)
-        val reminderIntervalSeekBar = dialogView.findViewById<SeekBar>(R.id.reminder_interval_seekbar)
-        val reminderIntervalText = dialogView.findViewById<MaterialTextView>(R.id.reminder_interval_text)
-        val enableRemindersCheckbox = dialogView.findViewById<android.widget.CheckBox>(R.id.enable_reminders_checkbox)
-        
-        val currentSettings = hydrationManager.loadSettings()
-        
-        // Pre-fill with current settings
-        dailyGoalEditText.setText(currentSettings.dailyGoal.toString())
-        reminderIntervalSeekBar.max = 5 // 1-6 hours
-        reminderIntervalSeekBar.progress = currentSettings.reminderInterval - 1
-        reminderIntervalText.text = "Reminder every ${currentSettings.reminderInterval} hours"
-        enableRemindersCheckbox.isChecked = currentSettings.isEnabled
-        
-        reminderIntervalSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val hours = progress + 1
-                reminderIntervalText.text = "Reminder every $hours hours"
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-        
+        // Redirect to the advanced notification settings in SettingsFragment
         AlertDialog.Builder(requireContext())
-            .setTitle("Hydration Settings")
-            .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
-                val dailyGoal = dailyGoalEditText.text.toString().toIntOrNull() ?: 8
-                val reminderInterval = reminderIntervalSeekBar.progress + 1
-                val isEnabled = enableRemindersCheckbox.isChecked
-                
-                val newSettings = currentSettings.copy(
-                    dailyGoal = dailyGoal,
-                    reminderInterval = reminderInterval,
-                    isEnabled = isEnabled
-                )
-                hydrationManager.saveSettings(newSettings)
-                
-                // Update reminder schedule
-                if (isEnabled) {
-                    reminderManager.scheduleReminders()
-                } else {
-                    reminderManager.cancelReminders()
-                }
-                
-                loadData()
+            .setTitle("💧 Hydration Settings")
+            .setMessage("For advanced hydration reminder settings including minute-based intervals, please go to:\n\nSettings → 🔔 Notification Settings\n\nThis will give you access to:\n• Minute-based reminders\n• Custom time ranges\n• Quick presets\n• Test notifications")
+            .setPositiveButton("Go to Settings") { _, _ ->
+                // Navigate to settings fragment
+                findNavController().navigate(R.id.action_nav_hydration_to_nav_settings)
             }
             .setNegativeButton("Cancel", null)
             .show()

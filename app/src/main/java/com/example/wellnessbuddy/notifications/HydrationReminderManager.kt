@@ -33,22 +33,30 @@ class HydrationReminderManager(private val context: Context) {
         createNotificationChannel()
     }
     
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Hydration Reminders",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Reminds you to drink water throughout the day"
-                enableVibration(true)
-                enableLights(true)
+        private fun createNotificationChannel() {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val channel = NotificationChannel(
+                        CHANNEL_ID,
+                        "Hydration Reminders",
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        description = "Reminds you to drink water throughout the day"
+                        enableVibration(true)
+                        enableLights(true)
+                        setShowBadge(true)
+                        lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+                        setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI, null)
+                    }
+
+                    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    notificationManager.createNotificationChannel(channel)
+                    android.util.Log.d("HydrationReminder", "Notification channel created successfully")
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("HydrationReminder", "Error creating notification channel", e)
             }
-            
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
         }
-    }
     
     fun scheduleReminders() {
         val settings = hydrationManager.loadSettings()
@@ -58,52 +66,135 @@ class HydrationReminderManager(private val context: Context) {
             return
         }
         
-        val intervalMinutes = settings.reminderInterval * 60 // Convert hours to minutes
-        val startHour = 8 // Start at 8 AM
-        val endHour = 22 // End at 10 PM
+        // Get interval in minutes using the new system
+        val intervalMinutes = when (settings.reminderIntervalType) {
+            com.example.wellnessbuddy.data.ReminderIntervalType.MINUTES -> settings.reminderInterval
+            com.example.wellnessbuddy.data.ReminderIntervalType.HOURS -> settings.reminderInterval * 60
+        }
         
-        // Calculate number of reminders per day
-        val totalMinutes = (endHour - startHour) * 60
-        val numberOfReminders = totalMinutes / intervalMinutes
+        // For testing: if interval is very short (≤ 5 minutes), schedule an immediate test alarm
+        if (intervalMinutes <= 5) {
+            scheduleImmediateTestAlarm()
+        }
         
-        // Schedule reminders throughout the day
-        for (i in 0 until numberOfReminders) {
-            val reminderTime = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, startHour)
-                set(Calendar.MINUTE, i * intervalMinutes)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-                
-                // If the time has passed today, schedule for tomorrow
-                if (timeInMillis <= System.currentTimeMillis()) {
-                    add(Calendar.DAY_OF_MONTH, 1)
+        // Parse start and end times from settings with validation
+        val startTimeParts = settings.startTime.split(":")
+        val endTimeParts = settings.endTime.split(":")
+        
+        if (startTimeParts.size != 2 || endTimeParts.size != 2) {
+            android.util.Log.e("HydrationReminder", "Invalid time format: start=${settings.startTime}, end=${settings.endTime}")
+            return
+        }
+        
+        val startHour = try { startTimeParts[0].toInt() } catch (e: NumberFormatException) { 8 }
+        val startMinute = try { startTimeParts[1].toInt() } catch (e: NumberFormatException) { 0 }
+        val endHour = try { endTimeParts[0].toInt() } catch (e: NumberFormatException) { 22 }
+        val endMinute = try { endTimeParts[1].toInt() } catch (e: NumberFormatException) { 0 }
+        
+        // Validate interval
+        if (intervalMinutes <= 0) {
+            android.util.Log.e("HydrationReminder", "Invalid interval: $intervalMinutes minutes")
+            return
+        }
+        
+        // Calculate total active minutes
+        val startTotalMinutes = startHour * 60 + startMinute
+        val endTotalMinutes = endHour * 60 + endMinute
+        val totalActiveMinutes = endTotalMinutes - startTotalMinutes
+        
+        if (totalActiveMinutes <= 0) {
+            android.util.Log.e("HydrationReminder", "Invalid time range: start=$startHour:$startMinute, end=$endHour:$endMinute")
+            return
+        }
+        
+        // Calculate number of reminders
+        val numberOfReminders = (totalActiveMinutes / intervalMinutes).coerceAtLeast(1)
+        
+        android.util.Log.d("HydrationReminder", "Scheduling $numberOfReminders reminders every $intervalMinutes minutes from $startHour:$startMinute to $endHour:$endMinute")
+        
+        // Cancel existing reminders first
+        cancelReminders(numberOfReminders)
+        
+        // Schedule reminders throughout the active period
+        try {
+            for (i in 0 until numberOfReminders) {
+                val reminderMinutes = startTotalMinutes + (i * intervalMinutes)
+                val reminderHour = reminderMinutes / 60
+                val reminderMinute = reminderMinutes % 60
+
+                val reminderTime = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, reminderHour)
+                    set(Calendar.MINUTE, reminderMinute)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+
+                    // If the time has passed today, schedule for tomorrow
+                    if (timeInMillis <= System.currentTimeMillis()) {
+                        add(Calendar.DAY_OF_MONTH, 1)
+                    }
                 }
+
+                val intent = Intent(context, HydrationReminderReceiver::class.java).apply {
+                    putExtra("reminder_id", i)
+                    putExtra("interval_minutes", intervalMinutes)
+                }
+
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    REQUEST_CODE + i,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                alarmManager.setRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    reminderTime.timeInMillis,
+                    AlarmManager.INTERVAL_DAY,
+                    pendingIntent
+                )
+                
+                android.util.Log.d("HydrationReminder", "Scheduled reminder $i at ${reminderHour}:${reminderMinute}")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("HydrationReminder", "Error scheduling reminders", e)
+        }
+    }
+    
+    private fun scheduleImmediateTestAlarm() {
+        try {
+            android.util.Log.d("HydrationReminder", "Scheduling immediate test alarm")
+            
+            // Schedule alarm for 10 seconds from now
+            val testTime = Calendar.getInstance().apply {
+                add(Calendar.SECOND, 10)
             }
             
             val intent = Intent(context, HydrationReminderReceiver::class.java).apply {
-                putExtra("reminder_id", i)
+                putExtra("reminder_id", -1) // Special ID for test alarm
+                putExtra("is_test", true)
             }
             
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
-                REQUEST_CODE + i,
+                9999, // Special request code for test alarm
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             
-            alarmManager.setRepeating(
+            alarmManager.setExact(
                 AlarmManager.RTC_WAKEUP,
-                reminderTime.timeInMillis,
-                AlarmManager.INTERVAL_DAY,
+                testTime.timeInMillis,
                 pendingIntent
             )
+            
+            android.util.Log.d("HydrationReminder", "Test alarm scheduled for ${testTime.time}")
+        } catch (e: Exception) {
+            android.util.Log.e("HydrationReminder", "Error scheduling test alarm", e)
         }
     }
     
-    fun cancelReminders() {
-        val numberOfReminders = 20 // Maximum expected reminders per day
-        
-        for (i in 0 until numberOfReminders) {
+    fun cancelReminders(maxReminders: Int = 20) {
+        for (i in 0 until maxReminders) {
             val intent = Intent(context, HydrationReminderReceiver::class.java)
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -116,23 +207,60 @@ class HydrationReminderManager(private val context: Context) {
         }
     }
     
+    fun checkNotificationStatus(): String {
+        val status = StringBuilder()
+        
+        // Check if notifications are enabled
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            status.append("Notifications enabled: ${notificationManager.areNotificationsEnabled()}\n")
+        }
+        
+        // Check channel status
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                .getNotificationChannel(CHANNEL_ID)
+            status.append("Channel exists: ${channel != null}\n")
+            if (channel != null) {
+                status.append("Channel importance: ${channel.importance}\n")
+                status.append("Channel enabled: ${channel.importance != NotificationManager.IMPORTANCE_NONE}\n")
+            }
+        }
+        
+        return status.toString()
+    }
+    
     fun showHydrationNotification() {
-        val settings = hydrationManager.loadSettings()
-        val dailyConsumption = settings.glassesConsumed
-        val progress = (dailyConsumption.toFloat() / settings.dailyGoal).coerceAtMost(1f)
-        
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_hydration)
-            .setContentTitle("💧 Time to Hydrate!")
-            .setContentText("You've had ${dailyConsumption}/${settings.dailyGoal} glasses today")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setAutoCancel(true)
-            .setProgress(settings.dailyGoal, dailyConsumption, false)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText("Stay hydrated! You're ${String.format("%.0f", progress * 100)}% towards your daily goal."))
-            .build()
-        
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        try {
+            // Check notification permissions
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (!notificationManager.areNotificationsEnabled()) {
+                    android.util.Log.e("HydrationReminder", "Notifications are disabled by user")
+                    return
+                }
+            }
+
+            val settings = hydrationManager.loadSettings()
+            val dailyConsumption = settings.glassesConsumed
+            val progress = (dailyConsumption.toFloat() / settings.dailyGoal).coerceAtMost(1f)
+
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_hydration)
+                .setContentTitle("💧 Time to Hydrate!")
+                .setContentText("You've had ${dailyConsumption}/${settings.dailyGoal} glasses today")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setProgress(settings.dailyGoal, dailyConsumption, false)
+                .setStyle(NotificationCompat.BigTextStyle()
+                    .bigText("Stay hydrated! You're ${String.format("%.0f", progress * 100)}% towards your daily goal."))
+                .setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
+                .setVibrate(longArrayOf(0, 300, 100, 300))
+                .build()
+
+            notificationManager.notify(NOTIFICATION_ID, notification)
+            android.util.Log.d("HydrationReminder", "Notification shown successfully")
+        } catch (e: Exception) {
+            android.util.Log.e("HydrationReminder", "Error showing notification", e)
+        }
     }
 }
 
@@ -141,7 +269,12 @@ class HydrationReminderManager(private val context: Context) {
  */
 class HydrationReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val reminderManager = HydrationReminderManager(context)
-        reminderManager.showHydrationNotification()
+        try {
+            val reminderManager = HydrationReminderManager(context)
+            reminderManager.showHydrationNotification()
+            android.util.Log.d("HydrationReminder", "Reminder received and notification shown")
+        } catch (e: Exception) {
+            android.util.Log.e("HydrationReminder", "Error in receiver", e)
+        }
     }
 }
