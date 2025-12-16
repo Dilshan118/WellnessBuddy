@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+  <group>
+    <path
+        android:pathData="M50,15 C50,15 75,35 75,60 C75,76.57 63.81,90 50,90 C36.19,90 25,76.57 25,60 C25,35 50,15 50,15 Z"
+        android:strokeWidth="1"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000">
+      <aapt:attr name="android:fillColor">
+        <gradient 
+            android:startX="50" 
+            android:startY="15" 
+            android:endX="50" 
+            android:endY="90" 
+            android:type="linear">
+          <item android:offset="0" android:color="#FF009688"/> <!-- wellness_accent -->
+          <item android:offset="1" android:color="#FF004D40"/> <!-- wellness_primary_variant -->
+        </gradient>
+      </aapt:attr>
+    </path>
+    <path
+        android:pathData="M50,15 C50,15 65,35 65,55 C65,65 58,75 50,75 C42,75 35,65 35,55 C35,35 50,15 50,15 Z"
+        android:strokeWidth="1"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000">
+      <aapt:attr name="android:fillColor">
+        <gradient 
+            android:startX="50" 
+            android:startY="15" 
+            android:endX="50" 
+            android:endY="75" 
+            android:type="linear">
+          <item android:offset="0" android:color="#FFFFFFFF"/> 
+          <item android:offset="1" android:color="#00FFFFFF"/> 
+        </gradient>
+      </aapt:attr>
+    </path>
+  </group>
+</vector>

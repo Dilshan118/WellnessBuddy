@@ -8,6 +8,7 @@
     tools:context=".fragments.HomeFragment">
 
     <LinearLayout
+        android:id="@+id/dashboard_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -17,13 +18,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="32dp"
             android:gravity="center">
+            
+            <ImageView
+                android:id="@+id/app_logo"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_logo_wellness"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="@string/app_name"
+                android:elevation="8dp" />
             
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/dashboard_title"
+                android:text="WellnessBuddy"
                 android:textAppearance="@style/AppNameStyle"
                 android:gravity="center" />
                 
@@ -33,7 +44,7 @@
                 android:text="✨ Track your wellness journey ✨"
                 android:textSize="16sp"
                 android:textColor="@color/text_secondary"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:fontFamily="sans-serif"
                 android:gravity="center" />
         </LinearLayout>

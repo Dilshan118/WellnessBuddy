@@ -3,6 +3,8 @@
     <style name="Base.Theme.WellnessBuddy" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
     </style>
 
     <style name="Theme.WellnessBuddy" parent="Base.Theme.WellnessBuddy" />

@@ -82,6 +82,17 @@ class HomeFragment : Fragment() {
         accelerationValue = view.findViewById(R.id.acceleration_value)
         resetStepsBtn = view.findViewById(R.id.reset_steps_btn)
         sensorCard = view.findViewById(R.id.sensor_card)
+
+        // Animate content entry
+        val dashboardContent = view.findViewById<View>(R.id.dashboard_content)
+        dashboardContent.alpha = 0f
+        dashboardContent.translationY = 50f
+        dashboardContent.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(800)
+            .setStartDelay(100)
+            .start()
         
         setupViews()
         loadData()
